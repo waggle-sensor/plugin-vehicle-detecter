@@ -15,7 +15,7 @@ import logging
 from waggle.plugin import Plugin
 from waggle.data.vision import Camera
 
-TOPIC_TEMPLATE = "env.count"
+TOPIC_TEMPLATE = "env.vehicle.type"
 
 def get_arguments():
     parser = argparse.ArgumentParser(
@@ -109,6 +109,7 @@ def detect(yolov7_main, sample, do_sampling, plugin, args):
 
     if do_sampling:
         found = {}
+        found_image_640by640 = {}
         for result in results:
             l = result[0] * w/640  ## x1
             t = result[1] * h/640  ## y1
@@ -116,13 +117,16 @@ def detect(yolov7_main, sample, do_sampling, plugin, args):
             b = result[3] * h/640  ## y2
             conf = round(result[4], 2)
             name = outclass[int(result[5])]
+            object = frame[b:b+(t-b), r:r+(l-r)]
             frame = cv2.rectangle(frame, (int(l), int(t)), (int(r), int(b)), (255,0,0), 2)
             frame = cv2.putText(frame, f'{name}:{conf}', (int(l), int(t)-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 2)
 
             if not name in found:
                 found[name] = 1
+                found_image_640by640[name] = [object]
             else:
                 found[name] += 1
+                found_image_640by640[name].append(object)
 
         sample.data = frame
         sample.save('yolov7.jpg')
@@ -131,8 +135,8 @@ def detect(yolov7_main, sample, do_sampling, plugin, args):
 
         detection_stats = 'found objects: '
         for name, count in found.items():
-            detection_stats += f'{name}[{cound}] '
-            plugin.publish(f'{TOPIC_TEMPLATE}.{name}', count, timestamp=timestamp)
+            detection_stats += f'{name}[{count}] '
+            plugin.publish(f'{TOPIC_TEMPLATE}', [name, count], timestamp=timestamp)
         print(detection_stats)
     else:
         found = {}
@@ -146,7 +150,7 @@ def detect(yolov7_main, sample, do_sampling, plugin, args):
         detection_stats = 'found objects: '
         for name, count in found.items():
             detection_stats += f'{name}[{count}] '
-            plugin.publish(f'{TOPIC_TEMPLATE}.{name}', count, timestamp=timestamp)
+            plugin.publish(f'{TOPIC_TEMPLATE}', [name, count], timestamp=timestamp)
         print(detection_stats)
 
 if __name__ == "__main__":
