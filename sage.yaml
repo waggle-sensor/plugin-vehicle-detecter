@@ -1,0 +1,35 @@
+name: "vehicle_type_identifier"
+namespace: "waggle"
+version: "0.0.1"
+description: "Vehicle Type Identifier"
+authors: "Seongha Park <seongha.park@anl.gov>"
+collaborators: "Waggle Team <https://wa8.gl>"
+funding:
+license: "The license agreed by Argonne National Laboratory"
+keywords: "vehicle type identifier, machine learning"
+homepage: "https://github.com/waggle-sensor/plugin-vehicle-type-identifier/blob/main/ecr-meta/ecr-science-description.md"
+source:
+    architectures:
+        - "linux/arm64"
+        - "linux/amd64"
+    url: "https://github.com/waggle-sensor/plugin-vehicle-type-identifier"
+    branch: "main"
+inputs:
+    - id: "stream"
+      type: "string"
+    - id: "continuous"
+      type: "boolean"
+    - id: "sampling-interval"
+      type: "int"
+    - id: "weight"
+      type: "string"
+    - id: "labels"
+      type: "string"
+    - id: "classes"
+      type: "int"
+    - id: "conf-thres"
+      type: "float"
+    - id: "iou-thres"
+      type: "float"
+metadata:
+  ontology: env.vehicle.type
