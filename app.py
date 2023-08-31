@@ -118,6 +118,9 @@ def detect(yolov7_main, sample, do_sampling, plugin, args):
             conf = round(result[4], 2)
             name = outclass[int(result[5])]
             object = frame[b:b+(t-b), r:r+(l-r)]
+            sample.data = object
+            sample.save(name+'.jpg')
+            plugin.upload_file(name+'.jpg')
             frame = cv2.rectangle(frame, (int(l), int(t)), (int(r), int(b)), (255,0,0), 2)
             frame = cv2.putText(frame, f'{name}:{conf}', (int(l), int(t)-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 2)
 
